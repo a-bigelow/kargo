@@ -194,6 +194,61 @@ func Test_lexicalSelector_sortTags(t *testing.T) {
 				"latest",
 			},
 		},
+		{
+			name:     "edge case: empty list",
+			unsorted: []string{},
+			expected: []string{},
+		},
+		{
+			name:     "edge case: single element",
+			unsorted: []string{"v1.0.0"},
+			expected: []string{"v1.0.0"},
+		},
+		{
+			name: "edge case: large numbers",
+			unsorted: []string{
+				"2024.1.1",
+				"2024.1000.1",
+				"2024.999.1",
+				"2024.10.1",
+			},
+			expected: []string{
+				"2024.1000.1",
+				"2024.999.1",
+				"2024.10.1",
+				"2024.1.1",
+			},
+		},
+		{
+			name: "edge case: leading zeros",
+			unsorted: []string{
+				"2024.01.01",
+				"2024.1.1",
+				"2024.001.001",
+			},
+			expected: []string{
+				"2024.001.001",
+				"2024.01.01",
+				"2024.1.1",
+			},
+		},
+		{
+			name: "real world calver examples",
+			unsorted: []string{
+				"2024.12.15",
+				"2024.1.1",
+				"2024.11.30",
+				"2025.1.5",
+				"2024.2.28",
+			},
+			expected: []string{
+				"2025.1.5",
+				"2024.12.15",
+				"2024.11.30",
+				"2024.2.28",
+				"2024.1.1",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {

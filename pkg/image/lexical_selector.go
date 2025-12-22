@@ -101,11 +101,11 @@ func (l *lexicalSelector) Select(
 func (l *lexicalSelector) sortTags(tags []string) []string {
 	sorted := make([]string, len(tags))
 	copy(sorted, tags)
-	
+
 	slices.SortFunc(sorted, func(a, b string) int {
 		return -compareNatural(a, b) // Negative for descending order
 	})
-	
+
 	return sorted
 }
 
@@ -121,11 +121,11 @@ func (l *lexicalSelector) sortTags(tags []string) []string {
 func compareNatural(a, b string) int {
 	aTokens := tokenize(a)
 	bTokens := tokenize(b)
-	
+
 	for i := 0; i < len(aTokens) && i < len(bTokens); i++ {
 		aToken := aTokens[i]
 		bToken := bTokens[i]
-		
+
 		// If both tokens are numeric, compare them as numbers
 		if aToken.isNumeric && bToken.isNumeric {
 			if cmp := compareNumeric(aToken.value, bToken.value); cmp != 0 {
@@ -133,7 +133,7 @@ func compareNatural(a, b string) int {
 			}
 			continue
 		}
-		
+
 		// If only one is numeric, numeric comes after non-numeric
 		if aToken.isNumeric != bToken.isNumeric {
 			if aToken.isNumeric {
@@ -141,13 +141,13 @@ func compareNatural(a, b string) int {
 			}
 			return -1 // b is numeric, a is not, so a < b
 		}
-		
+
 		// Both are non-numeric, compare lexically
 		if cmp := strings.Compare(aToken.value, bToken.value); cmp != 0 {
 			return cmp
 		}
 	}
-	
+
 	// If all compared tokens are equal, the longer string is greater
 	return len(aTokens) - len(bTokens)
 }
@@ -164,19 +164,19 @@ func tokenize(s string) []token {
 	if len(s) == 0 {
 		return nil
 	}
-	
+
 	var tokens []token
 	var currentToken strings.Builder
 	var isNumeric bool
-	
+
 	// Determine if first character is numeric
 	if len(s) > 0 {
 		isNumeric = unicode.IsDigit(rune(s[0]))
 	}
-	
+
 	for _, ch := range s {
 		chIsNumeric := unicode.IsDigit(ch)
-		
+
 		if chIsNumeric == isNumeric {
 			// Continue current token
 			currentToken.WriteRune(ch)
@@ -193,7 +193,7 @@ func tokenize(s string) []token {
 			isNumeric = chIsNumeric
 		}
 	}
-	
+
 	// Add final token
 	if currentToken.Len() > 0 {
 		tokens = append(tokens, token{
@@ -201,7 +201,7 @@ func tokenize(s string) []token {
 			isNumeric: isNumeric,
 		})
 	}
-	
+
 	return tokens
 }
 
@@ -214,7 +214,7 @@ func compareNumeric(a, b string) int {
 	// Parse as integers for comparison
 	aNum, aErr := strconv.ParseInt(a, 10, 64)
 	bNum, bErr := strconv.ParseInt(b, 10, 64)
-	
+
 	// If both parse successfully, compare numerically
 	if aErr == nil && bErr == nil {
 		if aNum < bNum {
@@ -230,7 +230,7 @@ func compareNumeric(a, b string) int {
 		}
 		return 0
 	}
-	
+
 	// If one or both fail to parse, fall back to string comparison
 	return strings.Compare(a, b)
 }
