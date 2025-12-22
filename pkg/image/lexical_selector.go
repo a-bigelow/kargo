@@ -167,12 +167,8 @@ func tokenize(s string) []token {
 
 	var tokens []token
 	var currentToken strings.Builder
-	var isNumeric bool
-
 	// Determine if first character is numeric
-	if len(s) > 0 {
-		isNumeric = unicode.IsDigit(rune(s[0]))
-	}
+	isNumeric := unicode.IsDigit(rune(s[0]))
 
 	for _, ch := range s {
 		chIsNumeric := unicode.IsDigit(ch)
@@ -211,9 +207,9 @@ func tokenize(s string) []token {
 //   - zero if a == b
 //   - positive if a > b
 func compareNumeric(a, b string) int {
-	// Parse as integers for comparison
-	aNum, aErr := strconv.ParseInt(a, 10, 64)
-	bNum, bErr := strconv.ParseInt(b, 10, 64)
+	// Try parsing as uint64 for better range (0 to 2^64-1)
+	aNum, aErr := strconv.ParseUint(a, 10, 64)
+	bNum, bErr := strconv.ParseUint(b, 10, 64)
 
 	// If both parse successfully, compare numerically
 	if aErr == nil && bErr == nil {
@@ -231,6 +227,18 @@ func compareNumeric(a, b string) int {
 		return 0
 	}
 
-	// If one or both fail to parse, fall back to string comparison
-	return strings.Compare(a, b)
+	// If numbers are too large for uint64, compare by length first (more digits = larger)
+	// then lexically if same length
+	if aErr != nil && bErr != nil {
+		if len(a) != len(b) {
+			return len(a) - len(b)
+		}
+		return strings.Compare(a, b)
+	}
+
+	// If one parses and one doesn't, the one that parses is smaller (edge case)
+	if aErr != nil {
+		return 1 // a is too large, so a > b
+	}
+	return -1 // b is too large, so a < b
 }
