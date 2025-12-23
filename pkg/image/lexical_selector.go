@@ -202,6 +202,7 @@ func tokenize(s string) []token {
 }
 
 // compareNumeric compares two numeric strings as integers.
+// This function assumes that both strings contain only digits (as ensured by the tokenizer).
 // Returns:
 //   - negative if a < b
 //   - zero if a == b
@@ -228,7 +229,7 @@ func compareNumeric(a, b string) int {
 	}
 
 	// If numbers are too large for uint64, compare by length first (more digits = larger)
-	// then lexically if same length
+	// then lexically if same length. This handles version numbers with huge components.
 	if aErr != nil && bErr != nil {
 		if len(a) != len(b) {
 			return len(a) - len(b)
@@ -236,7 +237,7 @@ func compareNumeric(a, b string) int {
 		return strings.Compare(a, b)
 	}
 
-	// If one parses and one doesn't, the one that parses is smaller (edge case)
+	// If only one parses, the one that doesn't parse is too large (more digits)
 	if aErr != nil {
 		return 1 // a is too large, so a > b
 	}
