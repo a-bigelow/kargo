@@ -249,6 +249,23 @@ func Test_lexicalSelector_sortTags(t *testing.T) {
 				"2024.1.1",
 			},
 		},
+		{
+			name: "docs example: nightly-yyyymmdd format",
+			unsorted: []string{
+				"nightly-20240101",
+				"nightly-20241201",
+				"nightly-20240215",
+				"nightly-20250101",
+				"nightly-20240201",
+			},
+			expected: []string{
+				"nightly-20250101",
+				"nightly-20241201",
+				"nightly-20240215",
+				"nightly-20240201",
+				"nightly-20240101",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
