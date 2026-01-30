@@ -266,6 +266,47 @@ func Test_lexicalSelector_sortTags(t *testing.T) {
 				"nightly-20240101",
 			},
 		},
+		{
+			name: "edge case: numbers exceeding uint64",
+			unsorted: []string{
+				"v99999999999999999999.1.0",
+				"v88888888888888888888.2.0",
+				"v77777777777777777777.1.0",
+			},
+			expected: []string{
+				"v99999999999999999999.1.0",
+				"v88888888888888888888.2.0",
+				"v77777777777777777777.1.0",
+			},
+		},
+		{
+			name: "edge case: mixed uint64 overflow and normal numbers",
+			unsorted: []string{
+				"v1.0.0",
+				"v99999999999999999999.0.0",
+				"v2.0.0",
+			},
+			expected: []string{
+				"v99999999999999999999.0.0",
+				"v2.0.0",
+				"v1.0.0",
+			},
+		},
+		{
+			name: "edge case: pure numeric vs pure string comparison",
+			unsorted: []string{
+				"123",
+				"abc",
+				"456",
+				"xyz",
+			},
+			expected: []string{
+				"456",
+				"123",
+				"xyz",
+				"abc",
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
